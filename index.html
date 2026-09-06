@@ -2,7 +2,13 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- iOS 独立全屏 App 关键配置 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    
     <title>你画我猜出题器</title>
     <style>
         :root {
@@ -178,7 +184,7 @@
             text-align: center;
         }
 
-        /* ---------------- 全屏特大字体模式 ---------------- */
+        /* ---------------- 真正全屏模式 ---------------- */
         .fullscreen-overlay {
             display: none;
             position: fixed;
@@ -186,15 +192,16 @@
             left: 0;
             right: 0;
             bottom: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh; /* 针对移动端动态地址栏适配 */
             background-color: #090d16;
             color: #ffffff;
             z-index: 99999;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: calc(env(safe-area-inset-top, 20px) + 12px) 20px calc(env(safe-area-inset-bottom, 20px) + 16px) 20px;
+            padding: calc(env(safe-area-inset-top, 24px) + 12px) 20px calc(env(safe-area-inset-bottom, 20px) + 16px) 20px;
         }
 
         .fs-header {
@@ -232,7 +239,6 @@
             padding: 10px 16px;
         }
 
-        /* 特大字体设置：自动适应手机/平板/电脑 */
         .fs-word {
             font-size: clamp(4.5rem, 18vw, 11rem);
             font-weight: 900;
@@ -300,7 +306,7 @@
                 <button id="drawBtn" class="btn btn-primary" onclick="drawNextWord()">🎯 下一道题</button>
                 <button id="resetBtn" class="btn btn-secondary" onclick="confirmResetPool()">🔄 重置</button>
             </div>
-            <button class="btn btn-fullscreen" onclick="toggleFullscreen(true)">⛶ 进入全屏模式</button>
+            <button class="btn btn-fullscreen" onclick="enterFullscreen()">⛶ 进入全屏模式</button>
         </div>
     </div>
 
@@ -315,11 +321,11 @@
     </div>
 </div>
 
-<!-- 全屏特大字体覆盖层 -->
+<!-- 全屏界面 -->
 <div class="fullscreen-overlay" id="fullscreenOverlay">
     <div class="fs-header">
         <div>剩余: <b id="fsRemainCount">0</b> / <span id="fsTotalCount">0</span></div>
-        <button class="fs-exit-btn" onclick="toggleFullscreen(false)">✕ 退出全屏</button>
+        <button class="fs-exit-btn" onclick="exitFullscreen()">✕ 退出全屏</button>
     </div>
 
     <div class="fs-word-area">
@@ -457,10 +463,42 @@
         }, 2000);
     }
 
-    function toggleFullscreen(show) {
+    // 真正的硬件级全屏调用 + UI 遮罩展示
+    function enterFullscreen() {
         var overlay = document.getElementById("fullscreenOverlay");
-        overlay.style.display = show ? "flex" : "none";
+        overlay.style.display = "flex";
+
+        // 尝试调用系统的真正全屏 API（安卓 Chrome、PC 浏览器会隐藏地址栏）
+        var elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen().catch(function(){});
+        } else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        } else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
     }
+
+    // 退出全屏
+    function exitFullscreen() {
+        var overlay = document.getElementById("fullscreenOverlay");
+        overlay.style.display = "none";
+
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(function(){});
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+    }
+
+    // 监听返回键或物理退出
+    document.addEventListener("fullscreenchange", function() {
+        if (!document.fullscreenElement) {
+            document.getElementById("fullscreenOverlay").style.display = "none";
+        }
+    });
 
     window.onload = init;
 </script>
