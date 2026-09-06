@@ -2,210 +2,235 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <!-- iOS 独立全屏 App 关键配置 -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    
-    <title>你画我猜出题器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>你画我猜 - 随机出题器</title>
     <style>
         :root {
-            --primary: #4f46e5;
+            --primary-color: #4f46e5;
             --primary-hover: #4338ca;
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --text: #1e293b;
-            --text-sub: #64748b;
-            --border: #e2e8f0;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
+            --border-color: #e5e7eb;
+            --accent-green: #10b981;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg);
-            color: var(--text);
+            background-color: var(--bg-color);
+            color: var(--text-main);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 16px;
+            padding: 20px;
         }
 
         .container {
             width: 100%;
-            max-width: 500px;
+            max-width: 600px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
 
         .card {
-            background: var(--card);
+            background: var(--card-bg);
             border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-            border: 1px solid var(--border);
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        /* 出题展示区域 */
+        .display-card {
+            text-align: center;
+            padding: 32px 24px;
         }
 
         .stats {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             font-size: 0.95rem;
             color: var(--text-sub);
         }
 
-        .stats b {
-            color: var(--primary);
-            font-size: 1.1rem;
+        .stats span b {
+            color: var(--primary-color);
+            font-size: 1.15rem;
         }
 
         .word-box {
-            min-height: 130px;
+            min-height: 140px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #f1f5f9;
+            background: #f9fafb;
+            border: 2px dashed var(--border-color);
             border-radius: 12px;
-            margin-bottom: 20px;
-            padding: 16px;
-            text-align: center;
+            margin-bottom: 24px;
+            padding: 20px;
         }
 
         .current-word {
-            font-size: 2.2rem;
+            font-size: 2.6rem;
             font-weight: 800;
-            color: var(--text);
+            color: var(--text-main);
+            letter-spacing: 2px;
             word-break: break-word;
             line-height: 1.3;
         }
 
         .empty-hint {
             color: var(--text-sub);
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: normal;
         }
 
         .btn-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .btn-row {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
 
         .btn {
             border: none;
-            padding: 14px 16px;
-            font-size: 1.05rem;
+            padding: 14px 20px;
+            font-size: 1.1rem;
             font-weight: 600;
             border-radius: 10px;
             cursor: pointer;
-            transition: opacity 0.15s ease;
+            transition: all 0.15s ease;
             display: flex;
             justify-content: center;
             align-items: center;
+            gap: 8px;
         }
 
         .btn:active {
-            opacity: 0.8;
+            transform: scale(0.98);
         }
 
         .btn-primary {
-            background-color: var(--primary);
+            background-color: var(--primary-color);
             color: white;
             flex: 2;
         }
 
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
         .btn-primary:disabled {
-            background-color: #94a3b8;
-            opacity: 0.6;
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .btn-secondary {
-            background-color: #f1f5f9;
-            color: var(--text);
-            border: 1px solid var(--border);
+            background-color: #f3f4f6;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
             flex: 1;
         }
 
+        .btn-secondary:hover {
+            background-color: #e5e7eb;
+        }
+
         .btn-fullscreen {
-            background-color: #0f172a;
+            background-color: #1e293b;
             color: #ffffff;
             width: 100%;
         }
 
-        /* 设置面板 */
+        .btn-fullscreen:hover {
+            background-color: #0f172a;
+        }
+
+        /* 题库设置折叠面板 */
+        .settings-card {
+            border: 1px solid var(--border-color);
+        }
+
         details summary {
             font-weight: 600;
             cursor: pointer;
             color: var(--text-sub);
+            user-select: none;
         }
 
         details[open] summary {
-            margin-bottom: 12px;
-            color: var(--text);
+            margin-bottom: 16px;
+            color: var(--text-main);
         }
 
         .textarea-box {
             width: 100%;
-            height: 120px;
-            padding: 10px;
-            border: 1px solid var(--border);
+            height: 140px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 0.95rem;
+            line-height: 1.5;
             resize: vertical;
             outline: none;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .textarea-box:focus {
+            border-color: var(--primary-color);
         }
 
         .tip-text {
             font-size: 0.85rem;
             color: var(--text-sub);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .save-msg {
-            color: #10b981;
+            color: var(--accent-green);
             font-size: 0.9rem;
             margin-top: 8px;
             display: none;
             text-align: center;
         }
 
-        /* ---------------- 真正全屏模式 ---------------- */
+        /* ---------------- 全屏模式 ---------------- */
         .fullscreen-overlay {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
             width: 100vw;
             height: 100vh;
-            height: 100dvh; /* 针对移动端动态地址栏适配 */
-            background-color: #090d16;
+            background-color: #0f172a;
             color: #ffffff;
-            z-index: 99999;
+            z-index: 9999;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: calc(env(safe-area-inset-top, 24px) + 12px) 20px calc(env(safe-area-inset-bottom, 20px) + 16px) 20px;
+            padding: 30px 24px;
         }
 
         .fs-header {
             width: 100%;
+            max-width: 800px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -215,18 +240,20 @@
 
         .fs-header b {
             color: #38bdf8;
-            font-size: 1.25rem;
         }
 
         .fs-exit-btn {
-            background: rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-            border: none;
-            padding: 8px 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 14px;
             border-radius: 20px;
-            font-size: 0.95rem;
-            font-weight: 500;
+            font-size: 0.9rem;
             cursor: pointer;
+        }
+
+        .fs-exit-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
         .fs-word-area {
@@ -235,97 +262,110 @@
             justify-content: center;
             align-items: center;
             width: 100%;
+            max-width: 900px;
             text-align: center;
-            padding: 10px 16px;
+            padding: 20px;
         }
 
+        /* 仅放大了字体尺寸 */
         .fs-word {
-            font-size: clamp(4.5rem, 18vw, 11rem);
+            font-size: clamp(4.5rem, 16vw, 10rem);
             font-weight: 900;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             line-height: 1.15;
-            color: #ffffff;
+            color: #f8fafc;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
             word-break: break-word;
-            text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
         }
 
         .fs-hint {
-            font-size: clamp(1.8rem, 6vw, 3rem);
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
             color: #64748b;
             font-weight: normal;
         }
 
         .fs-controls {
             width: 100%;
-            max-width: 550px;
+            max-width: 600px;
             display: flex;
-            gap: 14px;
+            gap: 16px;
         }
 
         .fs-btn-next {
             flex: 2;
             background-color: #38bdf8;
             color: #0f172a;
-            font-size: 1.35rem;
+            font-size: 1.4rem;
             font-weight: 700;
-            padding: 18px;
+            padding: 18px 24px;
             border-radius: 14px;
         }
 
+        .fs-btn-next:hover {
+            background-color: #0ea5e9;
+        }
+
         .fs-btn-next:disabled {
-            background-color: #334155;
-            color: #64748b;
+            background-color: #475569;
+            color: #94a3b8;
+            cursor: not-allowed;
         }
 
         .fs-btn-reset {
             flex: 1;
-            background: rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-            border: none;
-            font-size: 1.15rem;
-            padding: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #f8fafc;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 1.1rem;
+            padding: 18px 20px;
             border-radius: 14px;
+        }
+
+        .fs-btn-reset:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
 <body>
 
+<!-- 普通视图 -->
 <div class="container" id="mainContainer">
-    <div class="card">
+    <div class="card display-card">
         <div class="stats">
             <span>总题数: <b id="totalCount">0</b></span>
             <span>剩余待抽: <b id="remainCount">0</b></span>
         </div>
 
         <div class="word-box">
-            <div id="wordDisplay" class="current-word empty-hint">准备就绪，点击抽题</div>
+            <div id="wordDisplay" class="current-word empty-hint">点击下方按钮开始</div>
         </div>
 
         <div class="btn-group">
             <div class="btn-row">
                 <button id="drawBtn" class="btn btn-primary" onclick="drawNextWord()">🎯 下一道题</button>
-                <button id="resetBtn" class="btn btn-secondary" onclick="confirmResetPool()">🔄 重置</button>
+                <button id="resetBtn" class="btn btn-secondary" onclick="confirmResetPool()">🔄 重置题库</button>
             </div>
-            <button class="btn btn-fullscreen" onclick="enterFullscreen()">⛶ 进入全屏模式</button>
+            <button class="btn btn-fullscreen" onclick="enterFullscreenMode()">⛶ 进入全屏模式</button>
         </div>
     </div>
 
-    <div class="card">
+    <!-- 题库管理区（折叠） -->
+    <div class="card settings-card">
         <details>
             <summary>⚙️ 自定义题库设置</summary>
-            <p class="tip-text" style="margin-top: 10px;">每行输入一个词语，修改后点击保存：</p>
-            <textarea id="wordInput" class="textarea-box" placeholder="例如：&#10;奥特曼&#10;西瓜&#10;奶茶"></textarea>
-            <button class="btn btn-primary" style="width: 100%; font-size: 0.95rem; padding: 10px;" onclick="saveCustomWords()">💾 保存题库</button>
+            <p class="tip-text">每行输入一个词语，空行会自动忽略。保存后浏览器会自动记住。</p>
+            <textarea id="wordInput" class="textarea-box" placeholder="例如：&#10;奥特曼&#10;西瓜&#10;珍珠奶茶&#10;蒙娜丽莎的微笑"></textarea>
+            <button class="btn btn-primary" style="width: 100%; font-size: 1rem; padding: 10px;" onclick="saveCustomWords()">💾 保存并更新题库</button>
             <div id="saveMsg" class="save-msg">✓ 题库保存成功！</div>
         </details>
     </div>
 </div>
 
-<!-- 全屏界面 -->
+<!-- 全屏极简视图 -->
 <div class="fullscreen-overlay" id="fullscreenOverlay">
     <div class="fs-header">
-        <div>剩余: <b id="fsRemainCount">0</b> / <span id="fsTotalCount">0</span></div>
-        <button class="fs-exit-btn" onclick="exitFullscreen()">✕ 退出全屏</button>
+        <div>剩余题数: <b id="fsRemainCount">0</b> / <span id="fsTotalCount">0</span></div>
+        <button class="fs-exit-btn" onclick="exitFullscreenMode()">✕ 退出全屏</button>
     </div>
 
     <div class="fs-word-area">
@@ -339,40 +379,34 @@
 </div>
 
 <script>
-    var defaultWords = [
+    const defaultWords = [
         "奥特曼", "珍珠奶茶", "吃鸡", "过山车", "仙人掌",
         "蒙娜丽莎", "打瞌睡", "皮卡丘", "火锅", "羽毛球",
         "小猪佩奇", "蓝牙耳机", "做核酸", "孙悟空", "爆米花"
     ];
 
-    var fullPool = [];
-    var currentPool = [];
-    var currentWord = "";
+    let fullPool = [];      // 完整题库
+    let currentPool = [];   // 未抽题池
+    let currentWord = "";   // 当前展示词语
 
-    function init() {
-        try {
-            var saved = localStorage.getItem("draw_guess_words");
-            if (saved) {
-                fullPool = JSON.parse(saved);
-            } else {
-                fullPool = defaultWords.slice();
-                localStorage.setItem("draw_guess_words", JSON.stringify(fullPool));
-            }
-        } catch (e) {
-            fullPool = defaultWords.slice();
+    window.onload = function() {
+        const savedWords = localStorage.getItem("draw_guess_words");
+        if (savedWords) {
+            fullPool = JSON.parse(savedWords);
+        } else {
+            fullPool = [...defaultWords];
+            localStorage.setItem("draw_guess_words", JSON.stringify(fullPool));
         }
 
-        var inputEl = document.getElementById("wordInput");
-        if (inputEl) {
-            inputEl.value = fullPool.join("\n");
-        }
-        resetPool();
-    }
+        document.getElementById("wordInput").value = fullPool.join("\n");
+        resetPool(false);
+    };
 
+    // 抽题逻辑
     function drawNextWord() {
         if (currentPool.length === 0) return;
 
-        var randomIndex = Math.floor(Math.random() * currentPool.length);
+        const randomIndex = Math.floor(Math.random() * currentPool.length);
         currentWord = currentPool.splice(randomIndex, 1)[0];
 
         renderWord();
@@ -381,24 +415,26 @@
         if (currentPool.length === 0) {
             document.getElementById("drawBtn").disabled = true;
             document.getElementById("fsDrawBtn").disabled = true;
-            document.getElementById("drawBtn").innerText = "题目已抽完";
+            document.getElementById("drawBtn").innerText = "题目已全部抽完";
             document.getElementById("fsDrawBtn").innerText = "已抽完";
         }
     }
 
+    // 确认重置
     function confirmResetPool() {
         if (currentPool.length < fullPool.length && currentPool.length > 0) {
             if (!confirm("确定要重置题库重新洗牌吗？")) return;
         }
-        resetPool();
+        resetPool(true);
     }
 
-    function resetPool() {
-        currentPool = fullPool.slice();
+    // 执行重置
+    function resetPool(isUserAction = false) {
+        currentPool = [...fullPool];
         currentWord = "";
-
-        document.getElementById("drawBtn").disabled = (fullPool.length === 0);
-        document.getElementById("fsDrawBtn").disabled = (fullPool.length === 0);
+        
+        document.getElementById("drawBtn").disabled = fullPool.length === 0;
+        document.getElementById("fsDrawBtn").disabled = fullPool.length === 0;
         document.getElementById("drawBtn").innerText = "🎯 下一道题";
         document.getElementById("fsDrawBtn").innerText = "下一题 ➔";
 
@@ -406,9 +442,10 @@
         updateStats();
     }
 
+    // 渲染词语到普通视图与全屏视图
     function renderWord() {
-        var wordEl = document.getElementById("wordDisplay");
-        var fsWordEl = document.getElementById("fsWordDisplay");
+        const wordEl = document.getElementById("wordDisplay");
+        const fsWordEl = document.getElementById("fsWordDisplay");
 
         if (fullPool.length === 0) {
             wordEl.className = "current-word empty-hint";
@@ -428,6 +465,7 @@
         }
     }
 
+    // 更新题数统计
     function updateStats() {
         document.getElementById("totalCount").innerText = fullPool.length;
         document.getElementById("remainCount").innerText = currentPool.length;
@@ -435,14 +473,13 @@
         document.getElementById("fsRemainCount").innerText = currentPool.length;
     }
 
+    // 保存自定义词库
     function saveCustomWords() {
-        var text = document.getElementById("wordInput").value;
-        var lines = text.split("\n");
-        var words = [];
-        for (var i = 0; i < lines.length; i++) {
-            var item = lines[i].trim();
-            if (item.length > 0) words.push(item);
-        }
+        const text = document.getElementById("wordInput").value;
+        const words = text
+            .split("\n")
+            .map(w => w.trim())
+            .filter(w => w.length > 0);
 
         if (words.length === 0) {
             alert("题库不能为空！");
@@ -450,57 +487,48 @@
         }
 
         fullPool = words;
-        try {
-            localStorage.setItem("draw_guess_words", JSON.stringify(fullPool));
-        } catch (e) {}
-
+        localStorage.setItem("draw_guess_words", JSON.stringify(fullPool));
         resetPool();
 
-        var msgEl = document.getElementById("saveMsg");
+        const msgEl = document.getElementById("saveMsg");
         msgEl.style.display = "block";
-        setTimeout(function() {
+        setTimeout(() => {
             msgEl.style.display = "none";
         }, 2000);
     }
 
-    // 真正的硬件级全屏调用 + UI 遮罩展示
-    function enterFullscreen() {
-        var overlay = document.getElementById("fullscreenOverlay");
-        overlay.style.display = "flex";
+    // 全屏模式控制（完全恢复原始版本逻辑）
+    function enterFullscreenMode() {
+        const fsOverlay = document.getElementById("fullscreenOverlay");
+        fsOverlay.style.display = "flex";
 
-        // 尝试调用系统的真正全屏 API（安卓 Chrome、PC 浏览器会隐藏地址栏）
-        var elem = document.documentElement;
+        const elem = document.documentElement;
         if (elem.requestFullscreen) {
-            elem.requestFullscreen().catch(function(){});
+            elem.requestFullscreen().catch(() => {});
         } else if (elem.webkitRequestFullscreen) {
             elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
         }
     }
 
-    // 退出全屏
-    function exitFullscreen() {
-        var overlay = document.getElementById("fullscreenOverlay");
-        overlay.style.display = "none";
+    function exitFullscreenMode() {
+        const fsOverlay = document.getElementById("fullscreenOverlay");
+        fsOverlay.style.display = "none";
 
         if (document.fullscreenElement || document.webkitFullscreenElement) {
             if (document.exitFullscreen) {
-                document.exitFullscreen().catch(function(){});
+                document.exitFullscreen().catch(() => {});
             } else if (document.webkitExitFullscreen) {
                 document.webkitExitFullscreen();
             }
         }
     }
 
-    // 监听返回键或物理退出
     document.addEventListener("fullscreenchange", function() {
         if (!document.fullscreenElement) {
             document.getElementById("fullscreenOverlay").style.display = "none";
         }
     });
-
-    window.onload = init;
 </script>
+
 </body>
 </html>
