@@ -2,14 +2,12 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>你画我猜 - 随机出题器</title>
     <style>
         :root {
             --primary-color: #4f46e5;
             --primary-hover: #4338ca;
-            --danger-color: #ef4444;
-            --danger-hover: #dc2626;
             --bg-color: #f3f4f6;
             --card-bg: #ffffff;
             --text-main: #1f2937;
@@ -51,7 +49,6 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
 
-        /* 出题展示区域 */
         .display-card {
             text-align: center;
             padding: 32px 24px;
@@ -149,23 +146,10 @@
             flex: 1;
         }
 
-        .btn-secondary:hover {
-            background-color: #e5e7eb;
-        }
-
         .btn-fullscreen {
             background-color: #1e293b;
             color: #ffffff;
             width: 100%;
-        }
-
-        .btn-fullscreen:hover {
-            background-color: #0f172a;
-        }
-
-        /* 题库设置折叠面板 */
-        .settings-card {
-            border: 1px solid var(--border-color);
         }
 
         details summary {
@@ -193,10 +177,6 @@
             margin-bottom: 12px;
         }
 
-        .textarea-box:focus {
-            border-color: var(--primary-color);
-        }
-
         .tip-text {
             font-size: 0.85rem;
             color: var(--text-sub);
@@ -211,7 +191,7 @@
             text-align: center;
         }
 
-        /* ---------------- 全屏模式 ---------------- */
+        /* ---------------- 安卓深度全屏样式 ---------------- */
         .fullscreen-overlay {
             display: none;
             position: fixed;
@@ -221,39 +201,43 @@
             height: 100vh;
             background-color: #0f172a;
             color: #ffffff;
-            z-index: 9999;
+            z-index: 2147483647; /* 置于顶层 */
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
-            padding: 30px 24px;
+            padding: 36px 30px;
+        }
+
+        /* 当元素处于系统真全屏时的标准伪类 */
+        .fullscreen-overlay:fullscreen {
+            display: flex !important;
+            width: 100%;
+            height: 100%;
         }
 
         .fs-header {
             width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: #94a3b8;
         }
 
         .fs-header b {
             color: #38bdf8;
+            font-size: 1.35rem;
         }
 
         .fs-exit-btn {
-            background: rgba(255, 255, 255, 0.1);
-            color: #cbd5e1;
+            background: rgba(255, 255, 255, 0.12);
+            color: #e2e8f0;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 6px 14px;
+            padding: 8px 18px;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 1rem;
             cursor: pointer;
-        }
-
-        .fs-exit-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
         }
 
         .fs-word-area {
@@ -262,31 +246,31 @@
             justify-content: center;
             align-items: center;
             width: 100%;
-            max-width: 900px;
+            max-width: 1100px;
             text-align: center;
             padding: 20px;
         }
 
-        /* 仅放大了字体尺寸 */
+        /* 超大字体展示，自适应平板屏幕 */
         .fs-word {
-            font-size: clamp(4.5rem, 16vw, 10rem);
+            font-size: clamp(5rem, 15vw, 11rem);
             font-weight: 900;
             letter-spacing: 4px;
             line-height: 1.15;
             color: #f8fafc;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            text-shadow: 0 4px 25px rgba(0,0,0,0.6);
             word-break: break-word;
         }
 
         .fs-hint {
-            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-size: clamp(2rem, 5vw, 3.2rem);
             color: #64748b;
             font-weight: normal;
         }
 
         .fs-controls {
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             display: flex;
             gap: 16px;
         }
@@ -295,14 +279,10 @@
             flex: 2;
             background-color: #38bdf8;
             color: #0f172a;
-            font-size: 1.4rem;
+            font-size: 1.45rem;
             font-weight: 700;
             padding: 18px 24px;
             border-radius: 14px;
-        }
-
-        .fs-btn-next:hover {
-            background-color: #0ea5e9;
         }
 
         .fs-btn-next:disabled {
@@ -313,16 +293,12 @@
 
         .fs-btn-reset {
             flex: 1;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.12);
             color: #f8fafc;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             padding: 18px 20px;
             border-radius: 14px;
-        }
-
-        .fs-btn-reset:hover {
-            background: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
@@ -349,7 +325,7 @@
         </div>
     </div>
 
-    <!-- 题库管理区（折叠） -->
+    <!-- 题库管理区 -->
     <div class="card settings-card">
         <details>
             <summary>⚙️ 自定义题库设置</summary>
@@ -385,9 +361,9 @@
         "小猪佩奇", "蓝牙耳机", "做核酸", "孙悟空", "爆米花"
     ];
 
-    let fullPool = [];      // 完整题库
-    let currentPool = [];   // 未抽题池
-    let currentWord = "";   // 当前展示词语
+    let fullPool = [];
+    let currentPool = [];
+    let currentWord = "";
 
     window.onload = function() {
         const savedWords = localStorage.getItem("draw_guess_words");
@@ -402,7 +378,6 @@
         resetPool(false);
     };
 
-    // 抽题逻辑
     function drawNextWord() {
         if (currentPool.length === 0) return;
 
@@ -420,7 +395,6 @@
         }
     }
 
-    // 确认重置
     function confirmResetPool() {
         if (currentPool.length < fullPool.length && currentPool.length > 0) {
             if (!confirm("确定要重置题库重新洗牌吗？")) return;
@@ -428,7 +402,6 @@
         resetPool(true);
     }
 
-    // 执行重置
     function resetPool(isUserAction = false) {
         currentPool = [...fullPool];
         currentWord = "";
@@ -442,7 +415,6 @@
         updateStats();
     }
 
-    // 渲染词语到普通视图与全屏视图
     function renderWord() {
         const wordEl = document.getElementById("wordDisplay");
         const fsWordEl = document.getElementById("fsWordDisplay");
@@ -465,7 +437,6 @@
         }
     }
 
-    // 更新题数统计
     function updateStats() {
         document.getElementById("totalCount").innerText = fullPool.length;
         document.getElementById("remainCount").innerText = currentPool.length;
@@ -473,7 +444,6 @@
         document.getElementById("fsRemainCount").innerText = currentPool.length;
     }
 
-    // 保存自定义词库
     function saveCustomWords() {
         const text = document.getElementById("wordInput").value;
         const words = text
@@ -497,16 +467,19 @@
         }, 2000);
     }
 
-    // 全屏模式控制（完全恢复原始版本逻辑）
+    // 核心修复：直接对全屏遮罩元素请求原生硬件全屏
     function enterFullscreenMode() {
         const fsOverlay = document.getElementById("fullscreenOverlay");
         fsOverlay.style.display = "flex";
 
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen().catch(() => {});
-        } else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
+        // 安卓 Chrome 直接对 overlay 请求全屏，会将地址栏和标签栏彻底收起
+        if (fsOverlay.requestFullscreen) {
+            fsOverlay.requestFullscreen().catch(() => {
+                // 备用兜底调用
+                document.documentElement.requestFullscreen().catch(() => {});
+            });
+        } else if (fsOverlay.webkitRequestFullscreen) {
+            fsOverlay.webkitRequestFullscreen();
         }
     }
 
@@ -523,6 +496,7 @@
         }
     }
 
+    // 监听系统物理返回键或手势下滑退出全屏
     document.addEventListener("fullscreenchange", function() {
         if (!document.fullscreenElement) {
             document.getElementById("fullscreenOverlay").style.display = "none";
